@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
-
+#include "database.h"
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/grpcpp.h>
@@ -23,15 +22,10 @@
 namespace greptime {
 
 using greptime::v1::GreptimeDatabase;
-using grpc::Channel;
 
-class GreptimeClient {
-   public:
-    GreptimeClient(std::string greptimedb_endpoint_);
-
-    std::shared_ptr<Channel> channel;
-    std::shared_ptr<GreptimeDatabase::Stub> stub;
-
-};
-
+Database::Database(std::string dbname_, std::string greptimedb_endpoint_) :
+            dbname{dbname_},
+            channel{grpc::CreateChannel(greptimedb_endpoint_, grpc::InsecureChannelCredentials())},
+            stub{GreptimeDatabase::NewStub(channel)},
+            stream_inserter(std::make_shared<StreamInserter>(dbname, channel, stub)){}
 }  // namespace greptime

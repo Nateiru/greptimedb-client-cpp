@@ -12,11 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(CLIENT_STREAM example_client_stream)
-add_executable(${CLIENT_STREAM} client_stream.cpp)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+project(db_client)
+
+set(OUTPUT_SOURCES
+        database.cpp
+        stream_inserter.cpp
+        )
+
+add_library(${PROJECT_NAME} ${OUTPUT_SOURCES})
 
 # greptime lib
-target_link_libraries(${CLIENT_STREAM} 
-        PUBLIC 
-        greptimedb_client_lib
+target_link_libraries(${PROJECT_NAME}
+        PUBLIC
+        proto_cpp
         )
+
+# third party lib
+target_link_libraries(${PROJECT_NAME}
+        PUBLIC
+        grpc grpc++
+        )
+

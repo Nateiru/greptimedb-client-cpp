@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(greptime_proto_cpp_lib)
+project(proto_cpp)
 
 file(GLOB_RECURSE OUTPUT_SOURCES "*.h" "*.cc")
 

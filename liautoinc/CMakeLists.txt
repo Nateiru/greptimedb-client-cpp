@@ -12,25 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-project(greptimedb_client_lib)
+# LiAutoInc Lib
+add_library(liautoinc liautoinc.h liautoinc.cpp)
 
-set(OUTPUT_SOURCES
-        client.cpp
-        database.cpp
-        stream_inserter.cpp
+target_link_libraries(liautoinc
+        PUBLIC
+        db_client
         )
 
-add_library(${PROJECT_NAME} ${OUTPUT_SOURCES})
+# LiAutoInc example
+add_executable(main main.cpp)
 
-# greptime lib
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC
-        greptime_proto_cpp_lib
-        )
-
-# third party lib
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC
-        grpc grpc++
+target_link_libraries(main
+        PUBLIC 
+        liautoinc
         )

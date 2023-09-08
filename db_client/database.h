@@ -11,18 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#pragma once
 
-#include "database.h"
+#include "stream_inserter.h"
 
 namespace greptime {
+using greptime::v1::InsertRequests;
 
-Database::Database(std::string dbname_, std::string greptimedb_endpoint_) :
-            dbname(std::move(dbname_)),
-            client(std::move(greptimedb_endpoint_)),
-            stream_inserter(StreamInserter(dbname,client.channel, client.stub)){}
+class Database {
+public:
+    Database(std::string dbname_, std::string greptimedb_endpoint_);
 
-StreamInserter Database::CreateStreamInserter() {
-    return StreamInserter(dbname,client.channel, client.stub);
-}
+private:
+    std::string dbname;
+    std::shared_ptr<Channel> channel;
+    std::shared_ptr<GreptimeDatabase::Stub> stub;
+    
+public:
+    std::shared_ptr<StreamInserter> stream_inserter;
+};
 
 }  // namespace greptime

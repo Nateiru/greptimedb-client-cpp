@@ -35,5 +35,5 @@ include_directories(
         )
 
 add_subdirectory(contrib)
-add_subdirectory(src)
-add_subdirectory(examples)
+add_subdirectory(db_client)
+add_subdirectory(liautoinc)
