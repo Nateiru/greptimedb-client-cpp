@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # LiAutoInc Lib
-add_library(liautoinc liautoinc.h liautoinc.cpp)
+add_library(liautoinc SHARED liautoinc.h liautoinc.cpp)
 
 target_link_libraries(liautoinc
         PUBLIC
