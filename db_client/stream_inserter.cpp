@@ -37,5 +37,4 @@ bool StreamInserter::WriteOnce(InsertRequest insert_request) {
     greptime_request.mutable_inserts()->Swap(&insert_requests); 
     return writer->Write(greptime_request);
 }
-
 }  // namespace greptime

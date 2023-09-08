@@ -22,13 +22,11 @@ class Database {
 public:
     Database(std::string dbname_, std::string greptimedb_endpoint_);
 
+    std::shared_ptr<StreamInserter> stream_inserter;
 private:
     std::string dbname;
     std::shared_ptr<Channel> channel;
     std::shared_ptr<GreptimeDatabase::Stub> stub;
-    
-public:
-    std::shared_ptr<StreamInserter> stream_inserter;
 };
 
 }  // namespace greptime

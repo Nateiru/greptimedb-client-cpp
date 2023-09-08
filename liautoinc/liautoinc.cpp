@@ -215,88 +215,10 @@ void LiAutoIncClient::commitData(std::map<int, int>  &canIdSizeMap,
            }
             insReq.add_columns()->Swap(&column);
         }
-        // pimpl->database.stream_inserter->Write(std::move(insReq));
         pimpl->database.stream_inserter->WriteOnce(std::move(insReq));
     }
 }
 
-// void LiAutoIncClient::testCommitData(const std::map<int, int>  &canIdSizeMap,
-//                         const std::map<int,std::vector<long>> &timeStampVec,
-//                         const std::map<int,std::vector<std::vector<SignalValue>>> &valuesMap,
-//                         const std::vector<std::string> &binaryValue) {
-
-//     // int arr[100];
-//     // int b = arr[111];
-//     for (const auto &_ : canIdSizeMap) {
-
-//         const auto & canid = _.first;
-//         const auto & n = _.second;
-//         const auto & tsVec = timeStampVec.at(canid);
-//         const auto & valuesVec = valuesMap.at(canid);
-//         if (!signalNameAndSchemaMap.count(canid)) {
-//             std::cout << "no this table_" << canid << std::endl;
-//             continue;
-//         }
-//         const auto & nameAndSchema = signalNameAndSchemaMap[canid];
-
-
-//         if(tsVec.size() != valuesVec.size()) {
-//             throw std::logic_error("The timestamp is inconsistent with the number of data rows");
-//         }
-
-//         if (n == 0) {
-//             continue;
-//         }
-//         int m = valuesVec.at(0).size();
-
-//         std::string table_name = "table_" + std::to_string(canid);
-
-//         InsertRequest insReq;
-//         insReq.set_table_name(table_name);
-//         insReq.set_row_count(n);
-//         // timestamp
-//         {
-//             Column column;
-//             column.set_column_name("ts");
-//             column.set_semantic_type(Column_SemanticType::Column_SemanticType_TIMESTAMP);
-//             column.set_datatype(ColumnDataType::TIMESTAMP_MILLISECOND);
-//             auto values = column.mutable_values();
-//             for (const auto& ts : tsVec) {
-//                 values->add_ts_millisecond_values(ts);
-//             }
-//             insReq.add_columns()->Swap(&column);
-//         }
-
-//         // n rows, m columns
-//         for (int j = 0; j < m; ++j) {
-//             const auto &column_name = nameAndSchema[j].first;
-//             const auto &signal_type_enum = nameAndSchema[j].second;
-//             Column column;
-//             if (column_name == "") {
-//                 std::cout << "column_name is null" << std::endl;
-//                 return;
-//             }
-//             column.set_column_name(column_name);
-//             column.set_semantic_type(Column_SemanticType::Column_SemanticType_FIELD);
-//             column.set_datatype(enumToDataType(signal_type_enum));
-//             auto values = column.mutable_values();
-//             for (int i = 0; i < n; ++i) {
-//                 assert(m == valuesVec.at(i).size());
-//                 const SignalValue &field = valuesVec.at(i).at(j);
-//                 if (signal_type_enum == SignalTypeEnum::binType) {
-//                     uint32_t idx = field.uint32Value;
-//                     values->add_string_values(binaryValue[idx]);
-//                     continue;
-//                 }
-//                 addValue(values, signal_type_enum, field);
-//            }
-//             insReq.add_columns()->Swap(&column);
-//         }
-//         pimpl->database.stream_inserter->Write(std::move(insReq));
-//         // pimpl->database.stream_inserter->WriteOnce(std::move(insReq));
-//     }
-// }
- 
 void LiAutoIncClient::finish() {
     pimpl->database.stream_inserter->WriteDone();
     grpc::Status status = pimpl->database.stream_inserter->Finish();

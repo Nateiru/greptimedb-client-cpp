@@ -68,7 +68,11 @@ int main() {
     liautoinc::LiAutoIncClient liautoinc_client("public", "127.0.0.1:4001");
     try {
         liautoinc_client.setCanIdSignalNameList(signalNameAndSchemaMap);
-        liautoinc_client.commitData(canIdSizeMap, timeStampVec, valuesMap, binVec);
+        for (int i = 1; i <= 100010; i++) {
+            std::cout << "--\n";
+            liautoinc_client.commitData(canIdSizeMap, timeStampVec, valuesMap, binVec);
+            std::cout << "biu\n";
+        }
         liautoinc_client.finish();
     }
     catch (const std::exception& e) // caught by reference to base

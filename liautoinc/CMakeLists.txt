@@ -13,12 +13,13 @@
 # limitations under the License.
 
 # LiAutoInc Lib
-add_library(liautoinc SHARED liautoinc.h liautoinc.cpp)
+add_library(liautoinc liautoinc.h liautoinc.cpp)
 
 target_link_libraries(liautoinc
         PUBLIC
         db_client
         )
+# bundle_static_library(liautoinc static_liautoinc)
 
 # LiAutoInc example
 add_executable(main main.cpp)
