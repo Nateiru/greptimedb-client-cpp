@@ -13,7 +13,11 @@
 # limitations under the License.
 
 cmake_minimum_required (VERSION 3.22)
-project (greptimedb-client-cpp VERSION 0.1 LANGUAGES CXX)
+project (db_client VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 11)              # Compile as C++11.
+set(CMAKE_CXX_STANDARD_REQUIRED ON)     # Require C++11 support.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g") # Enable optimization level 3
 
 # generate complie_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
