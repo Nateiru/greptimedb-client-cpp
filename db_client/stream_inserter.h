@@ -51,20 +51,16 @@ using grpc::ClientWriter;
 class StreamInserter {
 public:
 
-    StreamInserter(std::string dbname_, std::weak_ptr<Channel> channel_, std::weak_ptr<GreptimeDatabase::Stub> stub_);
+    StreamInserter(std::string dbname_, GreptimeDatabase::Stub* stub, GreptimeResponse* response);
 
     /// Write a InsertRequest into Buffer
     bool WriteOnce(InsertRequest insert_request);
 
     /// WriteDone confirm all requests in std::queue are sent
-    bool WriteDone() {
-        return writer->WritesDone();
-    }
+    bool WriteDone();
     /// Finish will return grpc Status
     /// See \a grpc::StatusCode for details on the available code 
     Status Finish() { return writer->Finish(); }
-
-    GreptimeResponse GetResponse() { return response; }
 
 protected:
     // static constexpr size_t BUFFER_SIZE = 100000;
@@ -72,9 +68,7 @@ protected:
 
 private:
     std::string dbname;
-    GreptimeResponse response;
     std::shared_ptr<ClientContext> context;
-    std::weak_ptr<Channel> channel;
     std::weak_ptr<GreptimeDatabase::Stub> stub;
     std::unique_ptr<ClientWriter<GreptimeRequest>> writer;
 };

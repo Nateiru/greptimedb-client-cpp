@@ -1,6 +1,9 @@
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
 
+#include "db_client/stream_inserter.h"
+#include "greptime/v1/database.pb.h"
 #include "liautoinc.h"
 #include <db_client/database.h>
 
@@ -14,6 +17,7 @@ using greptime::v1::Column_SemanticType;
 using greptime::v1::ColumnDataType;
 using greptime::v1::InsertRequest;
 using greptime::v1::Column_Values;
+using greptime::v1::GreptimeResponse;
 
 void LiAutoIncClient::setCanIdSignalNameList(std::unordered_map<
                 int, 
@@ -131,8 +135,10 @@ static ColumnDataType enumToDataType(SignalTypeEnum type) {
 }
 
 struct LiAutoIncClient::Database {
-    Database(std::string dbname_, std::string greptimedb_endpoint_) : database(dbname_, greptimedb_endpoint_) {}
-    greptime::Database database;
+  Database(std::string dbname_, std::string greptimedb_endpoint_) :
+    database(dbname_, greptimedb_endpoint_) {}
+    // inserter(std::make_shared<greptime::StreamInserter>(database.NewStreamInserter(&response))) {}
+  greptime::Database database;
 };
 
 LiAutoIncClient::LiAutoIncClient(std::string dbname_, std::string greptimedb_endpoint_) : 
@@ -150,90 +156,90 @@ void LiAutoIncClient::commitData(std::map<int, int>  &canIdSizeMap,
                         std::map<int,std::shared_ptr<std::vector<long>>> &timeStampVec,
                         std::map<int,std::shared_ptr<std::vector<std::shared_ptr<std::vector<SignalValue>>>>> &valuesMap,
                         std::vector<std::string> &binaryValue) {
-    for (const auto &_ : canIdSizeMap) {
+  
+  GreptimeResponse response;
+  auto inserter = pimpl->database.NewStreamInserter(&response);
 
-        const auto & canid = _.first;
-        const auto & n = _.second;
-        const auto & tsVec = timeStampVec[canid];
-        const auto & valuesVec = valuesMap[canid];
-        if (!signalNameAndSchemaMap.count(canid)) {
-            std::cout << "no this table_" << canid << std::endl;
-            continue;
-        }
-        const auto & nameAndSchema = signalNameAndSchemaMap[canid];
+  for (const auto &_ : canIdSizeMap) {
 
-
-        if(tsVec->size() != valuesVec->size()) {
-            throw std::logic_error("The timestamp is inconsistent with the number of data rows");
-        }
-
-        if (n == 0) {
-            continue;
-        }
-        int m = valuesVec->at(0)->size();
-
-        std::string table_name = "table_" + std::to_string(canid);
-
-        InsertRequest insReq;
-        insReq.set_table_name(table_name);
-        insReq.set_row_count(n);
-        // timestamp
-        {
-            Column column;
-            column.set_column_name("ts");
-            column.set_semantic_type(Column_SemanticType::Column_SemanticType_TIMESTAMP);
-            column.set_datatype(ColumnDataType::TIMESTAMP_MILLISECOND);
-            auto values = column.mutable_values();
-            for (const auto& ts : *tsVec) {
-                values->add_ts_millisecond_values(ts);
-            }
-            insReq.add_columns()->Swap(&column);
-        }
-
-        // n rows, m columns
-        for (int j = 0; j < m; ++j) {
-            const auto &column_name = nameAndSchema[j].first;
-            const auto &signal_type_enum = nameAndSchema[j].second;
-            Column column;
-            if (column_name == "") {
-                std::cout << "column_name is null" << std::endl;
-                return;
-            }
-            column.set_column_name(column_name);
-            column.set_semantic_type(Column_SemanticType::Column_SemanticType_FIELD);
-            column.set_datatype(enumToDataType(signal_type_enum));
-            auto values = column.mutable_values();
-            for (int i = 0; i < n; ++i) {
-                assert(m == valuesVec->at(i)->size());
-                const SignalValue &field = valuesVec->at(i)->at(j);
-                if (signal_type_enum == SignalTypeEnum::binType) {
-                    uint32_t idx = field.uint32Value;
-                    values->add_string_values(binaryValue[idx]);
-                    continue;
-                }
-                addValue(values, signal_type_enum, field);
-           }
-            insReq.add_columns()->Swap(&column);
-        }
-        pimpl->database.stream_inserter->WriteOnce(std::move(insReq));
+    const auto & canid = _.first;
+    const auto & n = _.second;
+    const auto & tsVec = timeStampVec[canid];
+    const auto & valuesVec = valuesMap[canid];
+    if (!signalNameAndSchemaMap.count(canid)) {
+      std::cout << "no this table_" << canid << std::endl;
+      continue;
     }
+    const auto & nameAndSchema = signalNameAndSchemaMap[canid];
+
+    if(tsVec->size() != valuesVec->size()) {
+      throw std::logic_error("The timestamp is inconsistent with the number of data rows");
+    }
+
+    if (n == 0) {
+      continue;
+    }
+    int m = valuesVec->at(0)->size();
+
+    std::string table_name = "table_" + std::to_string(canid);
+
+    InsertRequest insReq;
+    insReq.set_table_name(table_name);
+    insReq.set_row_count(n);
+    // timestamp
+    {
+      Column column;
+      column.set_column_name("ts");
+      column.set_semantic_type(Column_SemanticType::Column_SemanticType_TIMESTAMP);
+      column.set_datatype(ColumnDataType::TIMESTAMP_MILLISECOND);
+      auto values = column.mutable_values();
+      for (const auto& ts : *tsVec) {
+        values->add_ts_millisecond_values(ts);
+      }
+      insReq.add_columns()->Swap(&column);
+    }
+
+    // n rows, m columns
+    for (int j = 0; j < m; ++j) {
+      const auto &column_name = nameAndSchema[j].first;
+      const auto &signal_type_enum = nameAndSchema[j].second;
+      Column column;
+      if (column_name == "") {
+        std::cout << "column_name is null" << std::endl;
+        return;
+      }
+      column.set_column_name(column_name);
+      column.set_semantic_type(Column_SemanticType::Column_SemanticType_FIELD);
+      column.set_datatype(enumToDataType(signal_type_enum));
+      auto values = column.mutable_values();
+      for (int i = 0; i < n; ++i) {
+        assert(m == valuesVec->at(i)->size());
+        const SignalValue &field = valuesVec->at(i)->at(j);
+        if (signal_type_enum == SignalTypeEnum::binType) {
+          uint32_t idx = field.uint32Value;
+          values->add_string_values(binaryValue[idx]);
+          continue;
+        }
+        addValue(values, signal_type_enum, field);
+      }
+      insReq.add_columns()->Swap(&column);
+    }
+    inserter.WriteOnce(insReq);
+  }
+
+  // finish
+  inserter.WriteDone();
+  auto status = inserter.Finish();
+  if (status.ok()) {
+    std::cout << "success!" << std::endl;
+    std::cout << "notice: [";
+    std::cout << response.affected_rows().value() << "] ";
+    std::cout << "rows of data are successfully inserted into the public database"<< std::endl;
+  } else {
+    std::cout << "fail!" << std::endl;
+    std::string emsg = "error message: " + status.error_message() + "\nerror details: " + status.error_details() + "\n"; 
+    throw std::runtime_error(emsg);
+  }
 }
 
-void LiAutoIncClient::finish() {
-    pimpl->database.stream_inserter->WriteDone();
-    grpc::Status status = pimpl->database.stream_inserter->Finish();
-
-    if (status.ok()) {
-        std::cout << "success!" << std::endl;
-        auto response = pimpl->database.stream_inserter->GetResponse();
-
-        std::cout << "notice: [";
-        std::cout << response.affected_rows().value() << "] ";
-        std::cout << "rows of data are successfully inserted into the public database"<< std::endl;
-    } else {
-        std::cout << "fail!" << std::endl;
-        std::string emsg = "error message: " + status.error_message() + "\nerror details: " + status.error_details() + "\n"; 
-        throw std::runtime_error(emsg);
-    }
-}
 }

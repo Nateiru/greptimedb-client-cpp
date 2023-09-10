@@ -20,13 +20,14 @@ using greptime::v1::InsertRequests;
 
 class Database {
 public:
-    Database(std::string dbname_, std::string greptimedb_endpoint_);
+  Database(std::string dbname_, std::string greptimedb_endpoint_);
 
-    std::shared_ptr<StreamInserter> stream_inserter;
+  StreamInserter NewStreamInserter(GreptimeResponse* response);
+
 private:
-    std::string dbname;
-    std::shared_ptr<Channel> channel;
-    std::shared_ptr<GreptimeDatabase::Stub> stub;
+  std::string dbname;
+  std::shared_ptr<Channel> channel;
+  std::shared_ptr<GreptimeDatabase::Stub> stub;
 };
 
 }  // namespace greptime

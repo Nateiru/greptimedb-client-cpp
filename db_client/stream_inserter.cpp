@@ -16,25 +16,25 @@
 
 namespace greptime {
 
-StreamInserter::StreamInserter(std::string dbname_, std::weak_ptr<Channel> channel_, std::weak_ptr<GreptimeDatabase::Stub> stub_) :
-            dbname(dbname_),
-            channel(channel_),
-            stub(stub_) {
-    context = std::make_shared<ClientContext>();
-    context->set_wait_for_ready(true);
-    auto shared_stub = stub_.lock();
-    writer = std::move(shared_stub->HandleRequests(context.get(), &response));
+StreamInserter::StreamInserter(std::string dbname_, GreptimeDatabase::Stub* stub, GreptimeResponse* response) : dbname(dbname_) {
+  context = std::make_shared<ClientContext>();
+  context->set_wait_for_ready(true);
+  writer = std::move(stub->HandleRequests(context.get(), response));
 }
 
 bool StreamInserter::WriteOnce(InsertRequest insert_request) {
-    InsertRequests insert_requests;
-    insert_requests.add_inserts()->Swap(&insert_request);
-    RequestHeader request_header;
-    request_header.set_dbname(dbname);
+  InsertRequests insert_requests;
+  insert_requests.add_inserts()->Swap(&insert_request);
+  RequestHeader request_header;
+  request_header.set_dbname(dbname);
 
-    GreptimeRequest greptime_request;
-    greptime_request.mutable_header()->Swap(&request_header);
-    greptime_request.mutable_inserts()->Swap(&insert_requests); 
-    return writer->Write(greptime_request);
+  GreptimeRequest greptime_request;
+  greptime_request.mutable_header()->Swap(&request_header);
+  greptime_request.mutable_inserts()->Swap(&insert_requests); 
+  return writer->Write(greptime_request);
+}
+
+bool StreamInserter::WriteDone() {
+  return writer->WritesDone();
 }
 }  // namespace greptime

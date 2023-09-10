@@ -18,14 +18,20 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/client_context.h>
 #include <greptime/v1/database.grpc.pb.h>
+#include "db_client/stream_inserter.h"
 
 namespace greptime {
 
 using greptime::v1::GreptimeDatabase;
 
 Database::Database(std::string dbname_, std::string greptimedb_endpoint_) :
-            dbname{dbname_},
-            channel{grpc::CreateChannel(greptimedb_endpoint_, grpc::InsecureChannelCredentials())},
-            stub{GreptimeDatabase::NewStub(channel)},
-            stream_inserter(std::make_shared<StreamInserter>(dbname, channel, stub)){}
+          dbname{dbname_},
+          channel{grpc::CreateChannel(greptimedb_endpoint_, grpc::InsecureChannelCredentials())},
+          stub{GreptimeDatabase::NewStub(channel)} {}
+
+StreamInserter Database::NewStreamInserter(GreptimeResponse* response) {
+  assert(response != nullptr && "invalid arg: response = nullptr");
+  return StreamInserter(dbname, stub.get(), response);
+}
+
 }  // namespace greptime
