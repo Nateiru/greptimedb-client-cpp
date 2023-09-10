@@ -137,7 +137,6 @@ static ColumnDataType enumToDataType(SignalTypeEnum type) {
 struct LiAutoIncClient::Database {
   Database(std::string dbname_, std::string greptimedb_endpoint_) :
     database(dbname_, greptimedb_endpoint_) {}
-    // inserter(std::make_shared<greptime::StreamInserter>(database.NewStreamInserter(&response))) {}
   greptime::Database database;
 };
 

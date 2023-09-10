@@ -28,3 +28,10 @@ target_link_libraries(main
         PUBLIC 
         liautoinc
         )
+
+add_executable(test insert.cpp record.hpp)
+
+target_link_libraries(test
+        PUBLIC 
+        liautoinc
+        )
