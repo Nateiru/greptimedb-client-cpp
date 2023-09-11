@@ -65,12 +65,6 @@ public:
                             std::map<int,std::shared_ptr<std::vector<std::shared_ptr<std::vector<SignalValue>>>>> &valuesMap,
                             std::vector<std::string> &binaryValue);
 
-    /*
-    * commitData一只写入数据，最终需要调用 finish 返回写入的状态
-    * 调用 finish 后整个 Client 写入结束
-    */
-    void finish();
-
     ~LiAutoIncClient();
 private:
     std::unordered_map<int, std::vector<std::pair<std::string, SignalTypeEnum>>> signalNameAndSchemaMap;

@@ -22,116 +22,114 @@ using greptime::v1::GreptimeResponse;
 void LiAutoIncClient::setCanIdSignalNameList(std::unordered_map<
                 int, 
                 std::vector<std::pair<std::string, SignalTypeEnum>>> signalNameAndSchemaMap_) {
-
-    signalNameAndSchemaMap = std::move(signalNameAndSchemaMap_);
+  signalNameAndSchemaMap = std::move(signalNameAndSchemaMap_);
 }
 
 void addValue(Column_Values *values, const SignalTypeEnum &type, const SignalValue &typeValue) {
-    switch (type) {
-        case SignalTypeEnum::boolType: {
-            auto value = typeValue.boolValue;
-            values->add_bool_values(value);
-            break;
-        }
-        case SignalTypeEnum::int8Type: {
-            auto value = typeValue.int8Value;
-            values->add_i8_values(value);
-            break;
-        }
-        case SignalTypeEnum::int16Type: {
-            auto value = typeValue.int16Value;
-            values->add_i16_values(value);
-            break;
-        }
-        case SignalTypeEnum::int32Type: {
-            auto value = typeValue.int32Value;
-            values->add_i32_values(value);
-            break;
-        }
-        case SignalTypeEnum::int64Type: {
-            auto value = typeValue.int64Value;
-            values->add_i64_values(value);
-            break;
-        }
-        case SignalTypeEnum::uint8Type: {
-            auto value = typeValue.uint8Value;
-            values->add_u8_values(value);
-            break;
-        }
-        case SignalTypeEnum::uint16Type: {
-            auto value = typeValue.uint8Value;
-            values->add_u16_values(value);
-            break;
-        }
-        case SignalTypeEnum::uint32Type: {
-            auto value = typeValue.uint32Value;
-            values->add_u32_values(value);
-            break;
-        }
-        case SignalTypeEnum::uint64Type: {
-            auto value = typeValue.uint64Value;
-            values->add_u64_values(value);
-            break;
-        }
-        case SignalTypeEnum::float32Type: {
-            auto value = typeValue.float32Value;
-            values->add_f32_values(value);
-            break;
-        }
-        case SignalTypeEnum::doubleType: {
-            auto value = typeValue.doubleValue;
-            values->add_f64_values(value);
-            break;
-        }
-        default:
-            break;
+  switch (type) {
+    case SignalTypeEnum::boolType: {
+      auto value = typeValue.boolValue;
+      values->add_bool_values(value);
+      break;
     }
-
+    case SignalTypeEnum::int8Type: {
+      auto value = typeValue.int8Value;
+      values->add_i8_values(value);
+      break;
+    }
+    case SignalTypeEnum::int16Type: {
+      auto value = typeValue.int16Value;
+      values->add_i16_values(value);
+      break;
+    }
+    case SignalTypeEnum::int32Type: {
+      auto value = typeValue.int32Value;
+      values->add_i32_values(value);
+      break;
+    }
+    case SignalTypeEnum::int64Type: {
+      auto value = typeValue.int64Value;
+      values->add_i64_values(value);
+      break;
+    }
+    case SignalTypeEnum::uint8Type: {
+      auto value = typeValue.uint8Value;
+      values->add_u8_values(value);
+      break;
+    }
+    case SignalTypeEnum::uint16Type: {
+      auto value = typeValue.uint8Value;
+      values->add_u16_values(value);
+      break;
+    }
+    case SignalTypeEnum::uint32Type: {
+      auto value = typeValue.uint32Value;
+      values->add_u32_values(value);
+      break;
+    }
+    case SignalTypeEnum::uint64Type: {
+      auto value = typeValue.uint64Value;
+      values->add_u64_values(value);
+      break;
+    }
+    case SignalTypeEnum::float32Type: {
+      auto value = typeValue.float32Value;
+      values->add_f32_values(value);
+      break;
+    }
+    case SignalTypeEnum::doubleType: {
+      auto value = typeValue.doubleValue;
+      values->add_f64_values(value);
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 static ColumnDataType enumToDataType(SignalTypeEnum type) {
-    switch (type) {
-        case SignalTypeEnum::boolType: {
-            return ColumnDataType::BOOLEAN;
-        }
-        case SignalTypeEnum::int8Type: {
-            return ColumnDataType::INT8;
-        }
-        case SignalTypeEnum::int16Type: {
-            return ColumnDataType::INT16;
-        }
-        case SignalTypeEnum::int32Type: {
-            return ColumnDataType::INT32;
-        }
-        case SignalTypeEnum::int64Type: {
-            return ColumnDataType::INT64;
-        }
-        case SignalTypeEnum::uint8Type: {
-            return ColumnDataType::UINT8;
-        }
-        case SignalTypeEnum::uint16Type: {
-            return ColumnDataType::UINT16;
-        }
-        case SignalTypeEnum::uint32Type: {
-            return ColumnDataType::UINT32;
-        }
-        case SignalTypeEnum::uint64Type: {
-            return ColumnDataType::UINT64;
-        }
-        case SignalTypeEnum::float32Type: {
-            return ColumnDataType::FLOAT32;
-        }
-        case SignalTypeEnum::doubleType: {
-            return ColumnDataType::FLOAT64;
-        }
-        case SignalTypeEnum::binType: {
-            return ColumnDataType::STRING;
-        }
-        default:
-            break;
+  switch (type) {
+    case SignalTypeEnum::boolType: {
+      return ColumnDataType::BOOLEAN;
     }
-    throw std::logic_error("The data type indicated by the schema is inconsistent with the real data type");
-    return ColumnDataType::STRING;
+    case SignalTypeEnum::int8Type: {
+      return ColumnDataType::INT8;
+    }
+    case SignalTypeEnum::int16Type: {
+      return ColumnDataType::INT16;
+    }
+    case SignalTypeEnum::int32Type: {
+      return ColumnDataType::INT32;
+    }
+    case SignalTypeEnum::int64Type: {
+      return ColumnDataType::INT64;
+    }
+    case SignalTypeEnum::uint8Type: {
+      return ColumnDataType::UINT8;
+    }
+    case SignalTypeEnum::uint16Type: {
+      return ColumnDataType::UINT16;
+    }
+    case SignalTypeEnum::uint32Type: {
+      return ColumnDataType::UINT32;
+    }
+    case SignalTypeEnum::uint64Type: {
+      return ColumnDataType::UINT64;
+    }
+    case SignalTypeEnum::float32Type: {
+      return ColumnDataType::FLOAT32;
+    }
+    case SignalTypeEnum::doubleType: {
+      return ColumnDataType::FLOAT64;
+    }
+    case SignalTypeEnum::binType: {
+      return ColumnDataType::STRING;
+    }
+    default:
+      break;
+  }
+  throw std::logic_error("The data type indicated by the schema is inconsistent with the real data type");
+  return ColumnDataType::STRING;
 }
 
 struct LiAutoIncClient::Database {
@@ -176,6 +174,7 @@ void LiAutoIncClient::commitData(std::map<int, int>  &canIdSizeMap,
     }
 
     if (n == 0) {
+      std::cout << "table_" << canid << " data inserted is empty" << std::endl;
       continue;
     }
     int m = valuesVec->at(0)->size();
@@ -199,13 +198,16 @@ void LiAutoIncClient::commitData(std::map<int, int>  &canIdSizeMap,
     }
 
     // n rows, m columns
+    bool is_complete = true;
     for (int j = 0; j < m; ++j) {
       const auto &column_name = nameAndSchema[j].first;
       const auto &signal_type_enum = nameAndSchema[j].second;
       Column column;
       if (column_name == "") {
-        std::cout << "column_name is null" << std::endl;
-        return;
+        is_complete = false;
+        std::cout << "table_" << canid << " column_name" << "[" << j << "] is empty" << std::endl;
+        std::cout << "the value of table_" << canid << " is incomplete" << std::endl;
+        break;
       }
       column.set_column_name(column_name);
       column.set_semantic_type(Column_SemanticType::Column_SemanticType_FIELD);
@@ -223,7 +225,8 @@ void LiAutoIncClient::commitData(std::map<int, int>  &canIdSizeMap,
       }
       insReq.add_columns()->Swap(&column);
     }
-    inserter.WriteOnce(insReq);
+    if (is_complete)
+      inserter.WriteOnce(insReq);
   }
 
   // finish
